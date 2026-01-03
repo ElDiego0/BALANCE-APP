@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta charset="UTF-8">
+<title>BALANCE · Invertir sin miedo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+header {
+  text-align: center;
+  padding: 28px 10px;
+}
+
+.logo {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+}
+
+h1 {
+  letter-spacing: 4px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.container {
+  padding: 20px;
+  padding-bottom: 40px;
+}
+
+.card {
+  background: #020617;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #1e293b;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.buttons button {
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: #020617;
+  color: #94a3b8;
+  font-weight: bold;
+}
+
+.buttons button.active {
+  background: #4ade80;
+  color: #020617;
+}
+
+.chart-container {
+  height: 240px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  margin-top: 10px;
+}
+
+button.primary {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: #4ade80;
+  color: #020617;
+  font-weight: bold;
+}
+
+.riesgo {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.bajo { background: #22c55e; color: #020617; }
+.medio { background: #facc15; color: #020617; }
+.alto { background: #f87171; color: #020617; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <svg class="logo" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="42"
+      fill="none"
+      stroke="#4ade80"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-dasharray="210 60"/>
+  </svg>
+  <h1>BALANCE</h1>
+  <p class="subtitle">Invertir sin miedo, entender primero</p>
+</header>
+
+<div class="container">
+
+  <!-- Selector -->
+  <div class="card">
+    <h3>Selecciona inversiones</h3>
+    <p class="subtitle">Puedes elegir hasta 3 para comparar</p>
+    <div class="buttons" id="botones"></div>
+  </div>
+
+  <!-- Detalle -->
+  <div class="card">
+    <h3 id="titulo">Selecciona una inversión</h3>
+    <p id="descripcion" class="subtitle"></p>
+    <span id="riesgo" class="riesgo"></span>
+  </div>
+
+  <!-- Gráfico -->
+  <div class="card">
+    <h3>Crecimiento últimos 5 años</h3>
+    <p class="subtitle">Modelo educativo (no datos en tiempo real)</p>
+    <div class="chart-container">
+      <canvas id="grafico"></canvas>
+    </div>
+  </div>
+
+  <!-- Simulador -->
+  <div class="card">
+    <h3>Simulador</h3>
+    <p class="subtitle">¿Qué habría pasado si invertías…?</p>
+    <input type="number" id="monto" placeholder="Monto inicial ($)">
+    <button class="primary" onclick="simular()">Simular inversión</button>
+    <p id="resultado" class="subtitle"></p>
+  </div>
+
+</div>
+
+<script>
+const inversiones = {
+  SPY: {
+    nombre: "SPY · S&P 500",
+    descripcion: "Las 500 empresas más grandes de EE. UU. Base sólida para largo plazo.",
+    riesgo: "medio",
+    data: [100, 112, 125, 140, 160]
+  },
+  VUG: {
+    nombre: "VUG · Growth",
+    descripcion: "Empresas de crecimiento. Más subidas y bajadas.",
+    riesgo: "medio",
+    data: [100, 118, 138, 155, 180]
+  },
+  SCHD: {
+    nombre: "SCHD · Dividendos",
+    descripcion: "Empresas estables que pagan dividendos.",
+    riesgo: "bajo",
+    data: [100, 108, 115, 122, 130]
+  },
+  VEA: {
+    nombre: "VEA · Mercados desarrollados",
+    descripcion: "Europa, Japón y otros países desarrollados.",
+    riesgo: "medio",
+    data: [100, 105, 110, 120, 128]
+  },
+  GLD: {
+    nombre: "GLD · Oro",
+    descripcion: "Activo refugio frente a crisis e inflación.",
+    riesgo: "bajo",
+    data: [100, 102, 110, 135, 140]
+  },
+  BOTZ: {
+    nombre: "BOTZ · Robótica",
+    descripcion: "Innovación tecnológica. Alto potencial y riesgo.",
+    riesgo: "alto",
+    data: [100, 130, 160, 150, 190]
+  },
+  ARGT: {
+    nombre: "ARGT · Argentina",
+    descripcion: "Mercado emergente muy volátil.",
+    riesgo: "alto",
+    data: [100, 90, 110, 140, 120]
+  }
+};
+
+const botonesDiv = document.getElementById("botones");
+let seleccionadas = [];
+let chart;
+
+Object.keys(inversiones).forEach(key => {
+  const btn = document.createElement("button");
+  btn.innerText = key;
+  btn.onclick = () => toggleSeleccion(key, btn);
+  botonesDiv.appendChild(btn);
+});
+
+function toggleSeleccion(key, btn) {
+  if (seleccionadas.includes(key)) {
+    seleccionadas = seleccionadas.filter(k => k !== key);
+    btn.classList.remove("active");
+  } else {
+    if (seleccionadas.length >= 3) return;
+    seleccionadas.push(key);
+    btn.classList.add("active");
+  }
+  actualizarVista();
+}
+
+function actualizarVista() {
+  if (seleccionadas.length === 0) return;
+
+  const inv = inversiones[seleccionadas[0]];
+  document.getElementById("titulo").innerText = inv.nombre;
+  document.getElementById("descripcion").innerText = inv.descripcion;
+
+  const riesgoEl = document.getElementById("riesgo");
+  riesgoEl.className = `riesgo ${inv.riesgo}`;
+  riesgoEl.innerText = `Riesgo ${inv.riesgo.toUpperCase()}`;
+
+  renderChart();
+}
+
+function renderChart() {
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("grafico"), {
+    type: "line",
+    data: {
+      labels: ["Hace 5 años", "4", "3", "2", "Hoy"],
+      datasets: seleccionadas.map(key => ({
+        label: key,
+        data: inversiones[key].data,
+        tension: 0.4,
+        fill: false
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "#94a3b8" }}},
+      scales: {
+        y: { ticks: { color: "#94a3b8" }},
+        x: { ticks: { color: "#94a3b8" }}
+      }
+    }
+  });
+}
+
+function simular() {
+  const monto = Number(document.getElementById("monto").value);
+  if (!monto || seleccionadas.length === 0) return;
+
+  const inv = inversiones[seleccionadas[0]];
+  const factor = inv.data[inv.data.length - 1] / inv.data[0];
+  const resultado = Math.round(monto * factor);
+
+  document.getElementById("resultado").innerText =
+    `Invertir $${monto.toLocaleString()} en ${inv.nombre} hace 5 años sería hoy aproximadamente $${resultado.toLocaleString()}.`;
+}
+</script>
+
+</body>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+</html>
