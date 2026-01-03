@@ -296,3 +296,55 @@ if ("serviceWorker" in navigator) {
 </script>
 </html>
 
+<script>
+const assetColors = {
+  SPY: "#4ade80",   // verde
+  VUG: "#60a5fa",   // azul
+  SCHD: "#a78bfa",  // violeta
+  VEA: "#facc15",   // amarillo
+  GLD: "#f59e0b",   // dorado
+  BOTZ: "#fb7185",  // rojo suave
+  ARGT: "#38bdf8"   // celeste
+};
+</script>
+
+function renderChart(datasets, labels) {
+  if (chart) chart.destroy();
+
+  chart = new Chart(document.getElementById("grafico"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#e5e7eb"
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: "#9ca3af" } },
+        y: { ticks: { color: "#9ca3af" } }
+      }
+    }
+  });
+}
+
+function createDataset(symbol, prices) {
+  return {
+    label: symbol,
+    data: prices,
+    borderColor: assetColors[symbol] || "#ffffff",
+    backgroundColor: "transparent",
+    tension: 0.4,
+    borderWidth: 2
+  };
+}
+
+
+
