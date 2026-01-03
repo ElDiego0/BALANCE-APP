@@ -1,0 +1,44 @@
+{
+  "SPY": {
+    "name": "S&P 500",
+    "risk": "Medio",
+    "horizon": "Largo plazo",
+    "recommendation": "Base sólida para una cartera diversificada"
+  },
+  "VUG": {
+    "name": "Growth",
+    "risk": "Medio-Alto",
+    "horizon": "Largo plazo",
+    "recommendation": "Para buscar mayor crecimiento aceptando volatilidad"
+  },
+  "SCHD": {
+    "name": "Dividendos",
+    "risk": "Bajo-Medio",
+    "horizon": "Medio/Largo",
+    "recommendation": "Aporta estabilidad e ingresos"
+  },
+  "VEA": {
+    "name": "Mercados desarrollados",
+    "risk": "Medio",
+    "horizon": "Largo plazo",
+    "recommendation": "Diversificación internacional"
+  },
+  "GLD": {
+    "name": "Oro",
+    "risk": "Bajo",
+    "horizon": "Medio/Largo",
+    "recommendation": "Protección y cobertura"
+  },
+  "BOTZ": {
+    "name": "Robótica e IA",
+    "risk": "Alto",
+    "horizon": "Largo plazo",
+    "recommendation": "Apuesta tecnológica de alto riesgo"
+  },
+  "ARGT": {
+    "name": "Argentina",
+    "risk": "Muy Alto",
+    "horizon": "Largo plazo",
+    "recommendation": "Exposición especulativa a emergentes"
+  }
+}
