@@ -280,6 +280,13 @@ function simular() {
     `Invertir $${monto.toLocaleString()} en ${inv.nombre} hace 5 años sería hoy aproximadamente $${resultado.toLocaleString()}.`;
 }
 </script>
+<div id="quizOverlay" class="quiz hidden">
+  <div class="quiz-box">
+    <h2 id="quizQuestion"></h2>
+    <div id="quizAnswers"></div>
+    <div class="progress" id="quizProgress"></div>
+  </div>
+</div>
 
 </body>
 <script>
@@ -288,3 +295,4 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 </html>
+
