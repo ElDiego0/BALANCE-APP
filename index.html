@@ -1,350 +1,286 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-<meta charset="UTF-8">
-<title>BALANCE · Invertir sin miedo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BALANCE</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #0f172a;
-  color: #f8fafc;
-}
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
 
-header {
-  text-align: center;
-  padding: 28px 10px;
-}
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-.logo {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 12px;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #020617;
+      color: #e5e7eb;
+    }
 
-h1 {
-  letter-spacing: 4px;
-  margin: 0;
-}
+    header {
+      text-align: center;
+      padding: 24px;
+    }
 
-.subtitle {
-  color: #94a3b8;
-  font-size: 14px;
-}
+    header img {
+      width: 80px;
+      margin-bottom: 12px;
+    }
 
-.container {
-  padding: 20px;
-  padding-bottom: 40px;
-}
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
 
-.card {
-  background: #020617;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid #1e293b;
-}
+    .container {
+      padding: 16px;
+      max-width: 900px;
+      margin: auto;
+    }
 
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
+    .card {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
 
-.buttons button {
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  background: #020617;
-  color: #94a3b8;
-  font-weight: bold;
-}
+    .investments button {
+      margin: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: #1e293b;
+      color: white;
+      cursor: pointer;
+    }
 
-.buttons button.active {
-  background: #4ade80;
-  color: #020617;
-}
+    canvas {
+      height: 260px !important;
+    }
 
-.chart-container {
-  height: 240px;
-}
+    /* Riesgo */
+    .risk {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
 
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  margin-top: 10px;
-}
+    .risk.bajo { background:#064e3b; color:#4ade80; }
+    .risk.medio { background:#78350f; color:#facc15; }
+    .risk.alto { background:#7f1d1d; color:#fb7185; }
 
-button.primary {
-  width: 100%;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  background: #4ade80;
-  color: #020617;
-  font-weight: bold;
-}
+    /* Quiz */
+    .quiz {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
 
-.riesgo {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: bold;
-}
+    .quiz.hidden { display: none; }
 
-.bajo { background: #22c55e; color: #020617; }
-.medio { background: #facc15; color: #020617; }
-.alto { background: #f87171; color: #020617; }
-</style>
+    .quiz-box {
+      background: #020617;
+      padding: 24px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+    }
+
+    .quiz-box button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      background: #1e293b;
+      color: white;
+      font-size: 15px;
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-  <svg class="logo" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="42"
-      fill="none"
-      stroke="#4ade80"
-      stroke-width="6"
-      stroke-linecap="round"
-      stroke-dasharray="210 60"/>
-  </svg>
+  <img src="icon-512.png" alt="BALANCE logo">
   <h1>BALANCE</h1>
-  <p class="subtitle">Invertir sin miedo, entender primero</p>
+  <p>Invertir sin miedo</p>
 </header>
 
 <div class="container">
 
-  <!-- Selector -->
-  <div class="card">
-    <h3>Selecciona inversiones</h3>
-    <p class="subtitle">Puedes elegir hasta 3 para comparar</p>
-    <div class="buttons" id="botones"></div>
+  <div id="welcomeBox" class="card"></div>
+
+  <div class="card investments">
+    <h3>📊 Inversiones</h3>
+    <button onclick="selectAsset('SPY')">SPY</button>
+    <button onclick="selectAsset('VUG')">VUG</button>
+    <button onclick="selectAsset('SCHD')">SCHD</button>
+    <button onclick="selectAsset('VEA')">VEA</button>
+    <button onclick="selectAsset('GLD')">GLD</button>
+    <button onclick="selectAsset('BOTZ')">BOTZ</button>
+    <button onclick="selectAsset('ARGT')">ARGT</button>
   </div>
 
-  <!-- Detalle -->
   <div class="card">
-    <h3 id="titulo">Selecciona una inversión</h3>
-    <p id="descripcion" class="subtitle"></p>
-    <span id="riesgo" class="riesgo"></span>
+    <canvas id="chart"></canvas>
   </div>
 
-  <!-- Gráfico -->
-  <div class="card">
-    <h3>Crecimiento últimos 5 años</h3>
-    <p class="subtitle">Modelo educativo (no datos en tiempo real)</p>
-    <div class="chart-container">
-      <canvas id="grafico"></canvas>
-    </div>
-  </div>
+  <div id="details" class="card"></div>
 
-  <!-- Simulador -->
   <div class="card">
-    <h3>Simulador</h3>
-    <p class="subtitle">¿Qué habría pasado si invertías…?</p>
-    <input type="number" id="monto" placeholder="Monto inicial ($)">
-    <button class="primary" onclick="simular()">Simular inversión</button>
-    <p id="resultado" class="subtitle"></p>
+    <h3>📘 Aprender en 1 minuto</h3>
+    <ul>
+      <li>Un ETF agrupa muchas inversiones.</li>
+      <li>Diversificar reduce riesgos extremos.</li>
+      <li>El largo plazo suele ser clave.</li>
+      <li>Más riesgo implica más subidas y bajadas.</li>
+    </ul>
   </div>
 
 </div>
 
-<script>
-const inversiones = {
-  SPY: {
-    nombre: "SPY · S&P 500",
-    descripcion: "Las 500 empresas más grandes de EE. UU. Base sólida para largo plazo.",
-    riesgo: "medio",
-    data: [100, 112, 125, 140, 160]
-  },
-  VUG: {
-    nombre: "VUG · Growth",
-    descripcion: "Empresas de crecimiento. Más subidas y bajadas.",
-    riesgo: "medio",
-    data: [100, 118, 138, 155, 180]
-  },
-  SCHD: {
-    nombre: "SCHD · Dividendos",
-    descripcion: "Empresas estables que pagan dividendos.",
-    riesgo: "bajo",
-    data: [100, 108, 115, 122, 130]
-  },
-  VEA: {
-    nombre: "VEA · Mercados desarrollados",
-    descripcion: "Europa, Japón y otros países desarrollados.",
-    riesgo: "medio",
-    data: [100, 105, 110, 120, 128]
-  },
-  GLD: {
-    nombre: "GLD · Oro",
-    descripcion: "Activo refugio frente a crisis e inflación.",
-    riesgo: "bajo",
-    data: [100, 102, 110, 135, 140]
-  },
-  BOTZ: {
-    nombre: "BOTZ · Robótica",
-    descripcion: "Innovación tecnológica. Alto potencial y riesgo.",
-    riesgo: "alto",
-    data: [100, 130, 160, 150, 190]
-  },
-  ARGT: {
-    nombre: "ARGT · Argentina",
-    descripcion: "Mercado emergente muy volátil.",
-    riesgo: "alto",
-    data: [100, 90, 110, 140, 120]
-  }
-};
-
-const botonesDiv = document.getElementById("botones");
-let seleccionadas = [];
-let chart;
-
-Object.keys(inversiones).forEach(key => {
-  const btn = document.createElement("button");
-  btn.innerText = key;
-  btn.onclick = () => toggleSeleccion(key, btn);
-  botonesDiv.appendChild(btn);
-});
-
-function toggleSeleccion(key, btn) {
-  if (seleccionadas.includes(key)) {
-    seleccionadas = seleccionadas.filter(k => k !== key);
-    btn.classList.remove("active");
-  } else {
-    if (seleccionadas.length >= 3) return;
-    seleccionadas.push(key);
-    btn.classList.add("active");
-  }
-  actualizarVista();
-}
-
-function actualizarVista() {
-  if (seleccionadas.length === 0) return;
-
-  const inv = inversiones[seleccionadas[0]];
-  document.getElementById("titulo").innerText = inv.nombre;
-  document.getElementById("descripcion").innerText = inv.descripcion;
-
-  const riesgoEl = document.getElementById("riesgo");
-  riesgoEl.className = `riesgo ${inv.riesgo}`;
-  riesgoEl.innerText = `Riesgo ${inv.riesgo.toUpperCase()}`;
-
-  renderChart();
-}
-
-function renderChart() {
-  if (chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("grafico"), {
-    type: "line",
-    data: {
-      labels: ["Hace 5 años", "4", "3", "2", "Hoy"],
-      datasets: seleccionadas.map(key => ({
-        label: key,
-        data: inversiones[key].data,
-        tension: 0.4,
-        fill: false
-      }))
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: "#94a3b8" }}},
-      scales: {
-        y: { ticks: { color: "#94a3b8" }},
-        x: { ticks: { color: "#94a3b8" }}
-      }
-    }
-  });
-}
-
-function simular() {
-  const monto = Number(document.getElementById("monto").value);
-  if (!monto || seleccionadas.length === 0) return;
-
-  const inv = inversiones[seleccionadas[0]];
-  const factor = inv.data[inv.data.length - 1] / inv.data[0];
-  const resultado = Math.round(monto * factor);
-
-  document.getElementById("resultado").innerText =
-    `Invertir $${monto.toLocaleString()} en ${inv.nombre} hace 5 años sería hoy aproximadamente $${resultado.toLocaleString()}.`;
-}
-</script>
+<!-- QUIZ -->
 <div id="quizOverlay" class="quiz hidden">
   <div class="quiz-box">
     <h2 id="quizQuestion"></h2>
     <div id="quizAnswers"></div>
-    <div class="progress" id="quizProgress"></div>
+    <div id="quizProgress"></div>
   </div>
 </div>
 
-</body>
 <script>
+/* Colores por activo */
+const assetColors = {
+  SPY: "#4ade80",
+  VUG: "#60a5fa",
+  SCHD: "#a78bfa",
+  VEA: "#facc15",
+  GLD: "#f59e0b",
+  BOTZ: "#fb7185",
+  ARGT: "#38bdf8"
+};
+
+/* Info educativa */
+const investments = {
+  SPY: { name:"S&P 500", risk:"Medio", desc:"Representa las 500 empresas más grandes de EE.UU." },
+  VUG: { name:"Growth", risk:"Medio-Alto", desc:"Empresas con alto crecimiento esperado." },
+  SCHD:{ name:"Dividendos", risk:"Bajo-Medio", desc:"Empresas con pagos estables de dividendos." },
+  VEA:{ name:"Internacional", risk:"Medio", desc:"Mercados desarrollados fuera de EE.UU." },
+  GLD:{ name:"Oro", risk:"Bajo", desc:"Activo refugio contra crisis." },
+  BOTZ:{ name:"Robótica & IA", risk:"Alto", desc:"Tecnología e innovación." },
+  ARGT:{ name:"Argentina", risk:"Muy Alto", desc:"Mercado emergente volátil." }
+};
+
+/* Mensaje perfil */
+const profileMessages = {
+  conservador:"Buscás estabilidad y tranquilidad.",
+  moderado:"Buscás crecer con equilibrio.",
+  agresivo:"Priorizás crecimiento a largo plazo."
+};
+
+const profile = localStorage.getItem("investorProfile");
+if (profile) {
+  document.getElementById("welcomeBox").innerHTML =
+    `<h3>Perfil ${profile}</h3><p>${profileMessages[profile]}</p>`;
+}
+
+/* Gráfico */
+let chart;
+function renderChart(symbol) {
+  if (chart) chart.destroy();
+
+  const data = Array.from({length:60},(_,i)=>i+Math.random()*10);
+
+  chart = new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+      labels: data.map((_,i)=>i),
+      datasets: [{
+        label: symbol,
+        data,
+        borderColor: assetColors[symbol],
+        tension: 0.4
+      }]
+    },
+    options: { responsive:true, maintainAspectRatio:false }
+  });
+}
+
+/* Detalles */
+function renderRisk(level){
+  const map={Bajo:"bajo",Medio:"medio","Medio-Alto":"alto",Alto:"alto","Muy Alto":"alto"};
+  return `<span class="risk ${map[level]}">Riesgo ${level}</span>`;
+}
+
+function selectAsset(symbol){
+  renderChart(symbol);
+  const i = investments[symbol];
+  document.getElementById("details").innerHTML = `
+    <h3>${i.name}</h3>
+    ${renderRisk(i.risk)}
+    <p>${i.desc}</p>
+    <p><strong>Educativo:</strong> este activo puede subir y bajar. El tiempo suele ser clave.</p>
+  `;
+}
+
+/* Quiz inversor */
+const quizData=[
+  {q:"¿Cómo te sentís con las caídas?",a:[{t:"Prefiero estabilidad",v:0},{t:"Me adapto",v:1},{t:"No me molesta",v:2}]},
+  {q:"¿Cuándo usarías ese dinero?",a:[{t:"< 2 años",v:0},{t:"3-5 años",v:1},{t:"> 5 años",v:2}]},
+  {q:"¿Qué priorizás?",a:[{t:"No perder",v:0},{t:"Equilibrio",v:1},{t:"Crecimiento",v:2}]},
+  {q:"Si cae 20%...",a:[{t:"Vendo",v:0},{t:"Espero",v:1},{t:"Compro más",v:2}]}
+];
+
+let qi=0,score=0;
+const overlay=document.getElementById("quizOverlay");
+const qEl=document.getElementById("quizQuestion");
+const aEl=document.getElementById("quizAnswers");
+const pEl=document.getElementById("quizProgress");
+
+function showQuiz(){
+  overlay.classList.remove("hidden");
+  renderQ();
+}
+function renderQ(){
+  const q=quizData[qi];
+  qEl.textContent=q.q;
+  aEl.innerHTML="";
+  pEl.textContent=`${qi+1}/${quizData.length}`;
+  q.a.forEach(o=>{
+    const b=document.createElement("button");
+    b.textContent=o.t;
+    b.onclick=()=>{score+=o.v;qi++;qi<quizData.length?renderQ():finishQuiz();};
+    aEl.appendChild(b);
+  });
+}
+function finishQuiz(){
+  let p="moderado";
+  if(score<=3)p="conservador";
+  if(score>=8)p="agresivo";
+  localStorage.setItem("investorProfile",p);
+  overlay.classList.add("hidden");
+  location.reload();
+}
+if(!localStorage.getItem("investorProfile")) showQuiz();
+
+/* Service Worker */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 </script>
+
+</body>
 </html>
-
-<script>
-const assetColors = {
-  SPY: "#4ade80",   // verde
-  VUG: "#60a5fa",   // azul
-  SCHD: "#a78bfa",  // violeta
-  VEA: "#facc15",   // amarillo
-  GLD: "#f59e0b",   // dorado
-  BOTZ: "#fb7185",  // rojo suave
-  ARGT: "#38bdf8"   // celeste
-};
-</script>
-
-function renderChart(datasets, labels) {
-  if (chart) chart.destroy();
-
-  chart = new Chart(document.getElementById("grafico"), {
-    type: "line",
-    data: {
-      labels,
-      datasets: datasets
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: "#e5e7eb"
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { color: "#9ca3af" } },
-        y: { ticks: { color: "#9ca3af" } }
-      }
-    }
-  });
-}
-
-function createDataset(symbol, prices) {
-  return {
-    label: symbol,
-    data: prices,
-    borderColor: assetColors[symbol] || "#ffffff",
-    backgroundColor: "transparent",
-    tension: 0.4,
-    borderWidth: 2
-  };
-}
-
-
-
